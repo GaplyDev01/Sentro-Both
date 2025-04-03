@@ -9,6 +9,9 @@ NC='\033[0m' # No Color
 echo -e "${GREEN}News Impact Platform - Vercel Deployment Script${NC}"
 echo -e "${YELLOW}Preparing for deployment...${NC}"
 
+# Reference the verification document
+echo -e "${YELLOW}Please check DEPLOYMENT_VERIFICATION.md for platform status and deployment readiness${NC}"
+
 # Run pre-deployment check
 echo -e "${YELLOW}Running pre-deployment checks...${NC}"
 node pre-deploy-check.js
@@ -59,6 +62,7 @@ if [ $? -eq 0 ]; then
     echo "- JWT_SECRET"
     echo "- NEWS_API_KEY"
     echo "- RAPID_API_KEY"
+    echo -e "${YELLOW}For more details, see DEPLOYMENT_VERIFICATION.md${NC}"
 else
     echo -e "${RED}Deployment failed. Check the error messages above.${NC}"
 fi 
