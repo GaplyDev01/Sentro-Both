@@ -149,6 +149,48 @@ news-impact-platform/
 - [x] Prediction visualization components
 - [x] Vercel deployment configuration
 
+## Deployment Verification
+
+Before deploying the News Impact Platform, a comprehensive verification process should be completed to ensure everything works as expected. We've created several tools to facilitate this process:
+
+### Verification Scripts
+
+- **Full Verification Process**: Run the entire verification suite
+  ```
+  npm run verify
+  ```
+
+- **Unit Tests**: Run automated tests
+  ```
+  npm test
+  ```
+
+- **Manual Testing**: Interactive checklist for verifying user flows
+  ```
+  npm run manual-test
+  ```
+
+- **Performance Testing**: Measure page load and API response times
+  ```
+  npm run performance-test
+  ```
+
+- **Accessibility Testing**: Test WCAG compliance
+  ```
+  npm run accessibility-test
+  ```
+
+### Verification Reports
+
+The verification process generates several reports:
+- Unit test coverage in the `coverage/` directory
+- Performance metrics in `performance-report.html`
+- Accessibility results in `accessibility-reports/`
+- Manual test results in `PRE_DEPLOYMENT_TEST_PLAN.md`
+- Overall verification summary in `DEPLOYMENT_VERIFICATION.md`
+
+For detailed instructions, see [DEPLOYMENT_VERIFICATION_GUIDE.md](DEPLOYMENT_VERIFICATION_GUIDE.md).
+
 ## Deployment Instructions
 
 ### Deploy to Vercel (Recommended)

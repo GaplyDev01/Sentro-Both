@@ -1,172 +1,73 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
-// Layout
-import MainLayout from './components/layout/MainLayout';
-
-// Pages (to be implemented)
+// Import pages
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import BusinessSetupPage from './pages/BusinessSetupPage';
-import NewsFeedPage from './pages/NewsFeedPage';
-import NewsDetailPage from './pages/NewsDetailPage';
 import DashboardPage from './pages/DashboardPage';
+import NewsDetailPage from './pages/NewsDetailPage';
+import NewsFeedPage from './pages/NewsFeedPage';
+import BookmarksPage from './pages/BookmarksPage';
 import UserProfilePage from './pages/UserProfilePage';
 import SettingsPage from './pages/SettingsPage';
-import BookmarksPage from './pages/BookmarksPage';
-import NotFoundPage from './pages/NotFoundPage';
+import BusinessSetupPage from './pages/BusinessSetupPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import NotFoundPage from './pages/NotFoundPage';
 
-// Protected route wrapper
-const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+// Import theme
+import theme from './styles/theme';
+
+// PrivateRoute component
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated, isLoading } = useAuth();
   
-  // Show loading state if authentication is being checked
-  if (loading) {
-    return null; // Or a loading spinner
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
   }
   
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  return children;
+  return isAuthenticated ? children : <Navigate to="/login" />;
 };
-
-// Admin route wrapper 
-const AdminRoute = ({ children }) => {
-  const { currentUser, loading, isAdmin } = useAuth();
-  
-  // Show loading state if authentication is being checked
-  if (loading) {
-    return null; // Or a loading spinner
-  }
-  
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
-  
-  if (!isAdmin()) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-};
-
-// Theme configuration
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-    error: {
-      main: '#f44336',
-    },
-    warning: {
-      main: '#ff9800',
-    },
-    info: {
-      main: '#2196f3',
-    },
-    success: {
-      main: '#4caf50',
-    },
-    background: {
-      default: '#fafafa',
-      paper: '#fff',
-    },
-    text: {
-      primary: '#212121',
-    },
-  },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-    },
-    h2: {
-      fontSize: '2rem',
-    },
-    h3: {
-      fontSize: '1.75rem',
-    },
-    h4: {
-      fontSize: '1.5rem',
-    },
-    h5: {
-      fontSize: '1.25rem',
-    },
-    h6: {
-      fontSize: '1rem',
-    },
-    body1: {
-      fontSize: '1rem',
-    },
-    body2: {
-      fontSize: '0.875rem',
-    },
-    caption: {
-      fontSize: '0.75rem',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-        },
-      },
-    },
-  },
-});
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          {/* Protected routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <MainLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<HomePage />} />
-            <Route path="business-setup" element={<BusinessSetupPage />} />
-            <Route path="news" element={<NewsFeedPage />} />
-            <Route path="news/:id" element={<NewsDetailPage />} />
-            <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="profile" element={<UserProfilePage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="bookmarks" element={<BookmarksPage />} />
-            
-            {/* Admin routes */}
-            <Route path="admin" element={
-              <AdminRoute>
-                <AdminDashboardPage />
-              </AdminRoute>
-            } />
-          </Route>
-
-          {/* 404 route */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </AuthProvider>
-    </ThemeProvider>
+    <div data-testid="app">
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <Router>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              
+              {/* Protected routes */}
+              <Route path="/" element={<PrivateRoute><HomePage /></PrivateRoute>} />
+              <Route path="/dashboard" element={<PrivateRoute><DashboardPage /></PrivateRoute>} />
+              <Route path="/news" element={<PrivateRoute><NewsFeedPage /></PrivateRoute>} />
+              <Route path="/news/:id" element={<PrivateRoute><NewsDetailPage /></PrivateRoute>} />
+              <Route path="/bookmarks" element={<PrivateRoute><BookmarksPage /></PrivateRoute>} />
+              <Route path="/profile" element={<PrivateRoute><UserProfilePage /></PrivateRoute>} />
+              <Route path="/settings" element={<PrivateRoute><SettingsPage /></PrivateRoute>} />
+              <Route path="/business-setup" element={<PrivateRoute><BusinessSetupPage /></PrivateRoute>} />
+              <Route path="/admin" element={<PrivateRoute><AdminDashboardPage /></PrivateRoute>} />
+              
+              {/* 404 route */}
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </div>
   );
 }
 

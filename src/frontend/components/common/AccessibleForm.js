@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, FormHelperText, Button, CircularProgress } from '@mui/material';
 import PropTypes from 'prop-types';
-import { generateA11yId } from '../../utils/a11yUtils';
+import { generateA11yId } from '../../src/utils/a11yUtils';
 
 /**
  * An enhanced form component with improved accessibility features

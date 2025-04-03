@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ResponsiveContainer from '../ResponsiveContainer';
+import ResponsiveContainer from '../../../../../frontend/components/common/ResponsiveContainer';
 
 // Create a test theme
 const theme = createTheme();
 
-// Wrap component with necessary providers
+// Helper function to render with ThemeProvider
 const renderWithTheme = (ui) => {
   return render(
     <ThemeProvider theme={theme}>
@@ -16,58 +16,49 @@ const renderWithTheme = (ui) => {
 };
 
 describe('ResponsiveContainer', () => {
-  test('renders children correctly', () => {
+  it('renders children correctly', () => {
     renderWithTheme(
       <ResponsiveContainer>
-        <div data-testid="test-child">Test Content</div>
+        <div data-testid="child">Test content</div>
       </ResponsiveContainer>
     );
     
-    expect(screen.getByTestId('test-child')).toBeInTheDocument();
-    expect(screen.getByText('Test Content')).toBeInTheDocument();
+    expect(screen.getByTestId('child')).toBeInTheDocument();
   });
-  
-  test('applies correct max width', () => {
-    const { container } = renderWithTheme(
+
+  it('applies maxWidth correctly', () => {
+    renderWithTheme(
       <ResponsiveContainer maxWidth="sm">
-        <div>Test Content</div>
+        <div>Content</div>
       </ResponsiveContainer>
     );
     
-    // Find the Container component
-    const containerElement = container.firstChild;
-    
-    // Check if it has the correct max-width class
-    expect(containerElement).toHaveClass('MuiContainer-maxWidthSm');
+    // Check if the MUI Container has the maxWidth prop applied
+    const container = document.querySelector('.MuiContainer-maxWidthSm');
+    expect(container).toBeInTheDocument();
   });
-  
-  test('applies custom styles', () => {
+
+  it('applies custom styles via sx prop', () => {
     const customBgColor = 'rgb(240, 240, 240)';
     
-    const { container } = renderWithTheme(
+    renderWithTheme(
       <ResponsiveContainer sx={{ bgcolor: customBgColor }}>
-        <div>Test Content</div>
+        <div>Content</div>
       </ResponsiveContainer>
     );
     
-    // Find the Container component
-    const containerElement = container.firstChild;
-    
-    // Check if custom style is applied
-    expect(containerElement).toHaveStyle(`background-color: ${customBgColor}`);
+    const container = document.querySelector('.MuiContainer-root');
+    expect(container).toHaveStyle(`background-color: ${customBgColor}`);
   });
-  
-  test('disables gutters when specified', () => {
-    const { container } = renderWithTheme(
+
+  it('renders without gutters when disableGutters is true', () => {
+    renderWithTheme(
       <ResponsiveContainer disableGutters={true}>
-        <div>Test Content</div>
+        <div>Content</div>
       </ResponsiveContainer>
     );
     
-    // Find the Container component
-    const containerElement = container.firstChild;
-    
-    // Check if it has the disableGutters class
-    expect(containerElement).toHaveClass('MuiContainer-disableGutters');
+    const container = document.querySelector('.MuiContainer-disableGutters');
+    expect(container).toBeInTheDocument();
   });
 }); 
