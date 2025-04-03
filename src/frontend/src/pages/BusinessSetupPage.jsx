@@ -15,8 +15,7 @@ import {
   InputLabel,
   Select,
   CircularProgress,
-  Alert,
-  useTheme
+  Alert
 } from '@mui/material';
 import {
   Business as BusinessIcon,
@@ -265,7 +264,6 @@ const ReviewStep = ({ formData }) => (
 const steps = ['Business Information', 'Industry & Size', 'Review'];
 
 export default function BusinessSetupPage() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const { currentUser, updateBusinessDetails: updateAuthBusinessDetails } = useAuth();
   const [activeStep, setActiveStep] = useState(0);

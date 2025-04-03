@@ -4,8 +4,6 @@ import {
   Box, 
   Grid, 
   Paper, 
-  Card, 
-  CardContent,
   Tabs,
   Tab,
   ButtonGroup,
@@ -14,7 +12,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Divider,
   CircularProgress,
   Alert
 } from '@mui/material';
@@ -33,7 +30,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Line, Bar, Pie, Doughnut } from 'react-chartjs-2';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
 
 // Register Chart.js components
 ChartJS.register(
@@ -69,10 +66,6 @@ export default function DashboardPage() {
   
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
-  };
-  
-  const handleTimeFrameChange = (event) => {
-    setTimeFrame(event.target.value);
   };
   
   const handleCategoryChange = (event) => {

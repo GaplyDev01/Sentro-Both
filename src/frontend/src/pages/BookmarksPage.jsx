@@ -14,23 +14,18 @@ import {
   Alert,
   TextField,
   InputAdornment,
-  Divider,
   useTheme
 } from '@mui/material';
 import {
-  Bookmark as BookmarkIcon,
-  BookmarkBorder as BookmarkBorderIcon,
   Delete as DeleteIcon,
   Search as SearchIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { getBookmarks, removeBookmark } from '../services/newsService';
-import { useAuth } from '../context/AuthContext';
 
 export default function BookmarksPage() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const [bookmarks, setBookmarks] = useState([]);
   const [filteredBookmarks, setFilteredBookmarks] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

@@ -14,7 +14,7 @@ import { Navigate } from 'react-router-dom';
 
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = React.useState(0);
-  const { currentUser, isAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   
   // Redirect non-admin users
   if (!isAdmin()) {

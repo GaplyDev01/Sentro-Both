@@ -6,7 +6,6 @@ import {
   Grid,
   TextField,
   Button,
-  Divider,
   Alert,
   CircularProgress,
   Tabs,
@@ -27,7 +26,6 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 // Validation schemas
 const personalInfoSchema = yup.object({
@@ -61,7 +59,6 @@ const passwordSchema = yup.object({
 export default function UserProfilePage() {
   const theme = useTheme();
   const { currentUser, updateProfile, updateBusinessDetails } = useAuth();
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

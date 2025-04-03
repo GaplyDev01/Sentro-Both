@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -14,16 +14,28 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkLoggedIn = async () => {
       try {
-        const res = await axios.get('/api/auth/profile', {
-          withCredentials: true,
-        });
+        // Check if we have a token in localStorage
+        const token = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+        
+        if (token && storedUser) {
+          // Set the stored user while we verify with the server
+          setCurrentUser(JSON.parse(storedUser));
+        }
+        
+        const res = await api.get('/auth/profile');
         
         if (res.data && res.data.user) {
           setCurrentUser(res.data.user);
+          // Update stored user data
+          localStorage.setItem('user', JSON.stringify(res.data.user));
         }
       } catch (err) {
-        // User is not logged in, which is fine
-        console.log('User not logged in');
+        // User is not logged in or token is invalid
+        console.log('User not logged in or session expired');
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setCurrentUser(null);
       } finally {
         setLoading(false);
       }
@@ -38,16 +50,19 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
-      const res = await axios.post('/api/auth/login', {
+      const res = await api.post('/auth/login', {
         email,
-        password,
-      }, {
-        withCredentials: true,
+        password
       });
       
-      if (res.data && res.data.user) {
-        setCurrentUser(res.data.user);
-        return res.data.user;
+      if (res.data && res.data.data) {
+        setCurrentUser(res.data.data.user);
+        // Store token in localStorage
+        if (res.data.data.token) {
+          localStorage.setItem('token', res.data.data.token);
+          localStorage.setItem('user', JSON.stringify(res.data.data.user));
+        }
+        return res.data.data.user;
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
@@ -63,13 +78,19 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
-      const res = await axios.post('/api/auth/register', userData, {
-        withCredentials: true,
-      });
+      // Filter out confirmPassword which is not accepted by the backend
+      const { confirmPassword, ...filteredUserData } = userData;
       
-      if (res.data && res.data.user) {
-        setCurrentUser(res.data.user);
-        return res.data.user;
+      const res = await api.post('/auth/register', filteredUserData);
+      
+      if (res.data && res.data.data) {
+        setCurrentUser(res.data.data.user);
+        // Store token in localStorage
+        if (res.data.data.token) {
+          localStorage.setItem('token', res.data.data.token);
+          localStorage.setItem('user', JSON.stringify(res.data.data.user));
+        }
+        return res.data.data.user;
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
@@ -84,10 +105,11 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      await axios.post('/api/auth/logout', {}, {
-        withCredentials: true,
-      });
+      await api.post('/auth/logout');
       
+      // Remove token from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setCurrentUser(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Logout failed');
@@ -103,13 +125,12 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
-      const res = await axios.put('/api/users/profile', profileData, {
-        withCredentials: true,
-      });
+      const res = await api.put('/users/profile', profileData);
       
-      if (res.data && res.data.user) {
-        setCurrentUser(res.data.user);
-        return res.data.user;
+      if (res.data && res.data.data && res.data.data.user) {
+        setCurrentUser(res.data.data.user);
+        localStorage.setItem('user', JSON.stringify(res.data.data.user));
+        return res.data.data.user;
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Profile update failed');
@@ -125,13 +146,12 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
       
-      const res = await axios.patch('/api/users/business-details', businessData, {
-        withCredentials: true,
-      });
+      const res = await api.patch('/users/business-details', businessData);
       
-      if (res.data && res.data.user) {
-        setCurrentUser(res.data.user);
-        return res.data.user;
+      if (res.data && res.data.data && res.data.data.user) {
+        setCurrentUser(res.data.data.user);
+        localStorage.setItem('user', JSON.stringify(res.data.data.user));
+        return res.data.data.user;
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Business details update failed');

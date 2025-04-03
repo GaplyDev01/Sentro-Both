@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/backend/server.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     },
     {
@@ -15,8 +15,24 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "src/backend/server.js"
+      "src": "/api/health",
+      "dest": "/api/health.js"
+    },
+    {
+      "src": "/api/auth/(.*)",
+      "dest": "/api/auth/[...route].js?route=$1"
+    },
+    {
+      "src": "/api/users/(.*)",
+      "dest": "/api/users/[...route].js?route=$1"
+    },
+    {
+      "src": "/api/news/(.*)",
+      "dest": "/api/news/[...route].js?route=$1"
+    },
+    {
+      "src": "/api/predictions/(.*)",
+      "dest": "/api/predictions/[...route].js?route=$1"
     },
     {
       "src": "/(.*\\.(js|json|css|ico|png|jpg|svg|ttf|woff|woff2)$)",

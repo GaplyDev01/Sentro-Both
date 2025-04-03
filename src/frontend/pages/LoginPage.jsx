@@ -45,7 +45,11 @@ export default function LoginPage() {
       await login(data.email, data.password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to log in. Please check your credentials.');
+      console.error('Login error:', err);
+      setError(
+        err.response?.data?.message || 
+        'Failed to log in. Please check your credentials and try again.'
+      );
     } finally {
       setIsLoading(false);
     }

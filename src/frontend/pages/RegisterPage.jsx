@@ -85,11 +85,23 @@ export default function RegisterPage() {
       setFormData({ ...formData, ...data });
       setActiveStep(1);
     } else if (activeStep === 1) {
-      const completeData = { ...formData, ...data };
+      // Structure the data to match the backend's expected format
+      const registrationData = {
+        email: formData.email,
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        businessDetails: {
+          industry: data.industry,
+          location: data.location
+        }
+      };
+      
       try {
         setIsLoading(true);
         setError('');
-        await register(completeData);
+        await register(registrationData);
         navigate('/');
       } catch (err) {
         setError(err.response?.data?.message || 'Registration failed. Please try again.');

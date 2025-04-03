@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Typography,
   Box,
-  Paper,
   Grid,
   Switch,
   FormControlLabel,
@@ -26,11 +25,9 @@ import {
   Save as SaveIcon
 } from '@mui/icons-material';
 import { getUserPreferences, updateUserPreferences } from '../services/userService';
-import { useAuth } from '../context/AuthContext';
 
 export default function SettingsPage() {
   const theme = useTheme();
-  const { currentUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');

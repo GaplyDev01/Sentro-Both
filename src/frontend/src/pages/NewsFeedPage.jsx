@@ -70,7 +70,7 @@ export default function NewsFeedPage() {
   };
   
   // Query news feed
-  const { data, isLoading, isError, error, refetch } = useQuery(
+  const { isLoading, isError, refetch } = useQuery(
     ['newsFeed', filters, searchQuery, page],
     () => getNewsFeed({ 
       page, 

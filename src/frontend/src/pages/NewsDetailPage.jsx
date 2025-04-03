@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Typography, 
   Box, 
   Grid, 
   Paper,
-  Card,
-  CardContent,
   Divider,
   Chip,
   Button,
@@ -24,14 +22,9 @@ import {
   BookmarkBorder as BookmarkBorderIcon,
   Share as ShareIcon,
   TrendingUp as TrendingUpIcon,
-  Business as BusinessIcon,
-  Language as LanguageIcon,
   Timeline as TimelineIcon,
-  Public as PublicIcon,
   ArrowBack as ArrowBackIcon,
-  TrendingDown as TrendingDownIcon,
   Equalizer as EqualizerIcon,
-  AccessTime as AccessTimeIcon,
   BarChart as BarChartIcon,
   Star as StarIcon,
   PersonOutline as PersonOutlineIcon,
@@ -40,7 +33,6 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { getNewsById, getPrediction, bookmarkNews } from '../services/newsService';
-import { useAuth } from '../context/AuthContext';
 import { Bar, Radar, Doughnut } from 'react-chartjs-2';
 import { 
   Chart as ChartJS, 
@@ -74,7 +66,6 @@ export default function NewsDetailPage() {
   const theme = useTheme();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [activeChart, setActiveChart] = useState('bar');
   
@@ -95,8 +86,7 @@ export default function NewsDetailPage() {
   // Fetch impact prediction
   const { 
     data: prediction, 
-    isLoading: predictionLoading, 
-    isError: predictionError
+    isLoading: predictionLoading
   } = useQuery(
     ['prediction', id], 
     () => getPrediction(id),

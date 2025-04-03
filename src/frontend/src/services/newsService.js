@@ -48,7 +48,6 @@ const getMockNewsFeed = (params) => {
       'Financial Times', 'TechCrunch', 'Wall Street Journal', 
       'Bloomberg', 'Reuters', 'Healthcare Daily'
     ];
-    const source = sources[id % sources.length];
     
     // Article details
     switch (category) {
@@ -144,7 +143,6 @@ const getMockNewsFeed = (params) => {
   
   if (date && date !== 'all') {
     const today = new Date();
-    const articleDate = new Date(date);
     
     filteredArticles = filteredArticles.filter(article => {
       const articleDate = new Date(article.date);
@@ -305,7 +303,7 @@ export const getDashboardData = async (params = {}) => {
 
 // Mock function for dashboard data
 const getMockDashboardData = (params) => {
-  const { timeFrame = 'week', category = 'all' } = params;
+  const { timeFrame = 'week' } = params;
   
   // Overall impact score
   const impactScore = 70 + Math.floor(Math.random() * 15);
