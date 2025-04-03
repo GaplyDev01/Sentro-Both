@@ -19,6 +19,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-query": "^3.39.3",
     "react-router-dom": "^6.10.0",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^3.3.1",
     "yup": "^1.0.2"
   },
@@ -57,7 +58,6 @@
     "@babel/preset-react": "^7.23.3",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
-    "babel-jest": "^29.7.0",
-    "react-scripts": "^5.0.1"
+    "babel-jest": "^29.7.0"
   }
 }

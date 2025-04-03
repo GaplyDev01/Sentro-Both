@@ -15,7 +15,11 @@
     "performance-test": "node performance_test.js",
     "accessibility-test": "node accessibility_test.js",
     "pre-deploy-check": "npm test && npm run verify",
-    "build": "cd src/frontend && npm run build"
+    "build": "cd src/frontend && npm run build",
+    "vercel-build": "node vercel-build.js"
+  },
+  "engines": {
+    "node": ">=18.x"
   },
   "dependencies": {
     "@babel/runtime": "^7.27.0",
