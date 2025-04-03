@@ -5,6 +5,14 @@ const NewsArticle = require('../models/newsArticle.model');
  * Service for generating and managing predictions
  */
 class PredictionService {
+  constructor() {
+    // Simple in-memory cache for predictions
+    this.cache = new Map();
+    
+    // Cache expiration time (30 minutes)
+    this.cacheExpiry = 30 * 60 * 1000;
+  }
+  
   /**
    * Generate a prediction for a news article
    * @param {String} articleId - ID of the news article
@@ -13,6 +21,24 @@ class PredictionService {
    */
   async generatePrediction(articleId, user) {
     try {
+      if (!articleId) {
+        throw new Error('Article ID is required');
+      }
+      
+      if (!user || !user.id) {
+        throw new Error('Valid user is required');
+      }
+
+      // Create a unique cache key
+      const cacheKey = `prediction-${articleId}-${user.id}`;
+      
+      // Check cache first
+      const cachedPrediction = this.cache.get(cacheKey);
+      if (cachedPrediction && (Date.now() - cachedPrediction.timestamp) < this.cacheExpiry) {
+        console.log('Returning cached prediction');
+        return cachedPrediction.data;
+      }
+      
       // Find the news article
       const newsArticle = await NewsArticle.findById(articleId);
       if (!newsArticle) {
@@ -26,9 +52,20 @@ class PredictionService {
       });
 
       if (existingPrediction) {
+        // Cache the prediction
+        this.cache.set(cacheKey, {
+          data: existingPrediction,
+          timestamp: Date.now()
+        });
+        
         return existingPrediction;
       }
 
+      // Validate business details
+      if (!user.businessDetails || !user.businessDetails.industry || !user.businessDetails.location) {
+        throw new Error('Business details incomplete. Industry and location are required.');
+      }
+      
       // Get business details from the user
       const { industry, location } = user.businessDetails;
 
@@ -43,11 +80,17 @@ class PredictionService {
         location,
         ...prediction,
       });
+      
+      // Cache the prediction
+      this.cache.set(cacheKey, {
+        data: newPrediction,
+        timestamp: Date.now()
+      });
 
       return newPrediction;
     } catch (error) {
       console.error('Error generating prediction:', error.message);
-      throw new Error('Failed to generate prediction');
+      throw new Error(`Failed to generate prediction: ${error.message}`);
     }
   }
 

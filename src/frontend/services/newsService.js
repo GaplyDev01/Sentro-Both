@@ -5,18 +5,26 @@ const API_URL = '/api';
 // Get personalized news feed
 export const getNewsFeed = async (params = {}) => {
   try {
-    // For development/demo purposes, return mock data with pagination
-    if (process.env.NODE_ENV === 'development') {
+    // Only use mock data if USE_MOCK_DATA is explicitly set to 'true'
+    if (process.env.REACT_APP_USE_MOCK_DATA === 'true') {
       return getMockNewsFeed(params);
     }
     
-    // In production, use actual API
+    // By default, use the actual API
     const response = await axios.get(`${API_URL}/news`, {
       params,
       withCredentials: true
     });
     return response.data;
   } catch (error) {
+    console.error('Error fetching news feed:', error);
+    
+    // Fallback to mock data if API call fails and in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Falling back to mock data due to API error');
+      return getMockNewsFeed(params);
+    }
+    
     handleError(error);
     throw error;
   }
@@ -219,24 +227,68 @@ export const getNewsById = async (newsId) => {
 // Get prediction for a news article
 export const getPrediction = async (newsId) => {
   try {
+    // For development/demo purposes with mock data
+    if (process.env.REACT_APP_USE_MOCK_DATA === 'true') {
+      return getMockPrediction(newsId);
+    }
+    
+    // In production, use actual API
     const response = await axios.get(`${API_URL}/predictions/${newsId}`, {
       withCredentials: true
     });
-    return response.data;
+    
+    // Handle response including cached flag if present
+    const prediction = response.data;
+    
+    // Add isCached flag if it comes from the API
+    if (prediction.cached !== undefined) {
+      prediction.data.isCached = prediction.cached;
+    }
+    
+    return prediction.data;
   } catch (error) {
+    console.error('Error fetching prediction:', error);
+    
+    // Fallback to mock data if API call fails and in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Falling back to mock prediction due to API error');
+      return getMockPrediction(newsId);
+    }
+    
     handleError(error);
     throw error;
   }
 };
 
 // Get user's prediction history
-export const getPredictionHistory = async () => {
+export const getPredictionHistory = async (params = {}) => {
   try {
+    // For development/demo purposes with mock data
+    if (process.env.REACT_APP_USE_MOCK_DATA === 'true') {
+      return getMockPredictionHistory(params);
+    }
+    
+    // In production, use actual API
     const response = await axios.get(`${API_URL}/predictions/history`, {
+      params,
       withCredentials: true
     });
-    return response.data;
+    
+    return {
+      predictions: response.data.data,
+      total: response.data.count,
+      page: response.data.page || 1,
+      limit: response.data.limit || params.limit || 10
+    };
   } catch (error) {
+    console.error('Error fetching prediction history:', error);
+    
+    // Fallback to mock data if API call fails and in development
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Falling back to mock prediction history due to API error');
+      return getMockPredictionHistory(params);
+    }
+    
     handleError(error);
     throw error;
   }
@@ -439,6 +491,157 @@ const getMockDashboardData = (params) => {
         futurePredictions
       });
     }, 800);
+  });
+};
+
+// Mock function for predictions
+const getMockPrediction = (newsId) => {
+  // Parse the ID as a number to ensure consistent mock data
+  const id = parseInt(newsId) || 1;
+  
+  // Generate a prediction with some variability based on ID
+  const overallImpact = 20 + (id % 5) * 15; // Range: 20 to 80
+  
+  // Use the ID to determine if it's positive or negative
+  const isPositive = id % 2 === 0;
+  const finalImpact = isPositive ? overallImpact : -overallImpact;
+  
+  // Generate impact areas
+  const impactAreas = [
+    {
+      name: 'Financial',
+      score: finalImpact + (id % 10) - 5,
+      description: isPositive 
+        ? 'Likely to see positive financial outcomes due to market trends associated with this news.' 
+        : 'May face financial challenges as a result of the market shift described in this article.'
+    },
+    {
+      name: 'Operational',
+      score: finalImpact + (id % 6) - 3,
+      description: isPositive 
+        ? 'Operations could benefit from the described changes in industry standards.' 
+        : 'Operational adjustments may be needed to mitigate potential disruptions.'
+    },
+    {
+      name: 'Market',
+      score: finalImpact + (id % 15) - 7,
+      description: isPositive 
+        ? 'Market position could strengthen as competitors may be slower to adapt.' 
+        : 'Market share might be challenged by faster-moving competitors in this space.'
+    },
+    {
+      name: 'Reputation',
+      score: finalImpact + (id % 8) - 4,
+      description: isPositive 
+        ? 'Public perception likely to improve with proper communication of your response.' 
+        : 'Public relations strategy should be developed to address potential concerns.'
+    }
+  ];
+  
+  // Generate timeframes
+  const timeframes = [
+    {
+      period: 'short-term',
+      impact: finalImpact + 10,
+      description: `Immediate effects expected within the next ${1 + (id % 3)} months.`
+    },
+    {
+      period: 'medium-term',
+      impact: finalImpact,
+      description: `Effects will continue through the next ${4 + (id % 5)} months.`
+    },
+    {
+      period: 'long-term',
+      impact: finalImpact - 15,
+      description: `Long-term impact will diminish over the next ${12 + (id % 12)} months.`
+    }
+  ];
+  
+  // Generate recommendations
+  const recommendations = [
+    {
+      title: isPositive ? 'Capitalize on opportunity' : 'Mitigate potential risks',
+      description: isPositive
+        ? 'Develop strategies to leverage this trend for maximum benefit to your business.'
+        : 'Create contingency plans to address the potential negative impacts highlighted.',
+      priority: Math.abs(finalImpact) > 60 ? 'high' : Math.abs(finalImpact) > 30 ? 'medium' : 'low'
+    },
+    {
+      title: 'Monitor developments',
+      description: 'Set up regular monitoring to track how this situation evolves over time.',
+      priority: 'medium'
+    },
+    {
+      title: isPositive ? 'Align communication strategy' : 'Prepare stakeholder communications',
+      description: isPositive
+        ? 'Ensure your marketing and PR teams are aligned to communicate the benefits of your approach.'
+        : 'Develop clear messaging for stakeholders about how you\'re addressing these challenges.',
+      priority: 'high'
+    }
+  ];
+  
+  // Add a short delay to simulate API call
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        id: `pred-${newsId}`,
+        newsArticle: {
+          id: newsId,
+          title: `News Article ${newsId}`
+        },
+        overallImpact: finalImpact,
+        impactAreas,
+        timeframes,
+        recommendations,
+        confidenceLevel: 60 + (id % 25), // Range: 60-84
+        createdAt: new Date().toISOString(),
+        isCached: false
+      });
+    }, 800);
+  });
+};
+
+// Mock function for prediction history
+const getMockPredictionHistory = (params = {}) => {
+  const { page = 1, limit = 10 } = params;
+  
+  // Generate 20 mock prediction history items
+  const allPredictions = Array(20).fill().map((_, index) => {
+    const id = index + 1;
+    const isPositive = id % 2 === 0;
+    const impactScore = isPositive ? 20 + (id % 60) : -(20 + (id % 60));
+    
+    // Generate date within last 30 days
+    const date = new Date();
+    date.setDate(date.getDate() - (id % 30));
+    
+    return {
+      id: `pred-${id}`,
+      newsArticle: {
+        id: id,
+        title: `News Article ${id}: ${isPositive ? 'Positive' : 'Negative'} Impact on Industry`,
+      },
+      overallImpact: impactScore,
+      confidenceLevel: 60 + (id % 25),
+      createdAt: date.toISOString(),
+    };
+  });
+  
+  // Apply pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedPredictions = allPredictions.slice(startIndex, endIndex);
+  
+  // Add a short delay to simulate API call
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        predictions: paginatedPredictions,
+        total: allPredictions.length,
+        page: parseInt(page),
+        limit: parseInt(limit)
+      });
+    }, 600);
   });
 };
 

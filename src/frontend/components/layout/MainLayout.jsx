@@ -5,7 +5,6 @@ import {
   CssBaseline,
   AppBar,
   Toolbar,
-  Typography,
   Drawer,
   List,
   ListItem,
@@ -15,7 +14,11 @@ import {
   Divider,
   IconButton,
   useMediaQuery,
-  useTheme
+  useTheme,
+  Avatar,
+  Tooltip,
+  Badge,
+  SkipLink
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -25,10 +28,14 @@ import {
   Bookmark as BookmarkIcon,
   Person as PersonIcon,
   Settings as SettingsIcon,
-  Logout as LogoutIcon
+  Logout as LogoutIcon,
+  Notifications as NotificationsIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+
+// Import responsive components
+import ResponsiveTypography from '../common/ResponsiveTypography';
 
 // Drawer width
 const drawerWidth = 240;
@@ -37,8 +44,12 @@ export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const navigate = useNavigate();
   const { currentUser, logout, isAdmin } = useAuth();
+
+  // Adjust content padding based on screen size
+  const contentPadding = isMobile ? 2 : (isTablet ? 3 : 4);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -61,16 +72,23 @@ export default function MainLayout() {
   };
 
   const drawer = (
-    <Box>
+    <Box role="navigation" aria-label="Main Navigation">
       <Toolbar>
-        <Typography variant="h6" component="div">
+        <ResponsiveTypography 
+          variant="h6" 
+          component="div"
+          sx={{ fontWeight: 'bold' }}
+        >
           News Impact
-        </Typography>
+        </ResponsiveTypography>
       </Toolbar>
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/')}>
+          <ListItemButton 
+            onClick={() => handleNavigation('/')}
+            aria-label="Home"
+          >
             <ListItemIcon>
               <HomeIcon />
             </ListItemIcon>
@@ -78,7 +96,10 @@ export default function MainLayout() {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/dashboard')}>
+          <ListItemButton 
+            onClick={() => handleNavigation('/dashboard')}
+            aria-label="Dashboard"
+          >
             <ListItemIcon>
               <DashboardIcon />
             </ListItemIcon>
@@ -86,7 +107,10 @@ export default function MainLayout() {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/news')}>
+          <ListItemButton 
+            onClick={() => handleNavigation('/news')}
+            aria-label="News Feed"
+          >
             <ListItemIcon>
               <ArticleIcon />
             </ListItemIcon>
@@ -94,7 +118,10 @@ export default function MainLayout() {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/bookmarks')}>
+          <ListItemButton 
+            onClick={() => handleNavigation('/bookmarks')}
+            aria-label="Bookmarks"
+          >
             <ListItemIcon>
               <BookmarkIcon />
             </ListItemIcon>
@@ -105,7 +132,10 @@ export default function MainLayout() {
       <Divider />
       <List>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/profile')}>
+          <ListItemButton 
+            onClick={() => handleNavigation('/profile')}
+            aria-label="Profile"
+          >
             <ListItemIcon>
               <PersonIcon />
             </ListItemIcon>
@@ -113,7 +143,10 @@ export default function MainLayout() {
           </ListItemButton>
         </ListItem>
         <ListItem disablePadding>
-          <ListItemButton onClick={() => handleNavigation('/settings')}>
+          <ListItemButton 
+            onClick={() => handleNavigation('/settings')}
+            aria-label="Settings"
+          >
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
@@ -122,7 +155,10 @@ export default function MainLayout() {
         </ListItem>
         {isAdmin() && (
           <ListItem disablePadding>
-            <ListItemButton onClick={() => handleNavigation('/admin')}>
+            <ListItemButton 
+              onClick={() => handleNavigation('/admin')}
+              aria-label="Admin Dashboard"
+            >
               <ListItemIcon>
                 <DashboardIcon />
               </ListItemIcon>
@@ -131,7 +167,10 @@ export default function MainLayout() {
           </ListItem>
         )}
         <ListItem disablePadding>
-          <ListItemButton onClick={handleLogout}>
+          <ListItemButton 
+            onClick={handleLogout}
+            aria-label="Logout"
+          >
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>
@@ -145,35 +184,118 @@ export default function MainLayout() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
+      
+      {/* Skip link for keyboard users to bypass navigation */}
+      <Box 
+        sx={{ 
+          position: 'absolute', 
+          top: 0, 
+          left: 0, 
+          zIndex: theme.zIndex.tooltip + 1,
+          '& a': {
+            position: 'absolute',
+            width: 1,
+            height: 1,
+            overflow: 'hidden',
+            clip: 'rect(1px, 1px, 1px, 1px)',
+            whiteSpace: 'nowrap',
+            textDecoration: 'none',
+            bgcolor: 'primary.main',
+            color: 'primary.contrastText',
+            p: 2,
+            m: 1,
+            fontWeight: 'bold',
+            '&:focus': {
+              width: 'auto',
+              height: 'auto',
+              clip: 'auto',
+              overflow: 'visible',
+            },
+          }
+        }}
+      >
+        <a href="#main-content">Skip to main content</a>
+      </Box>
+      
       <AppBar
         position="fixed"
+        elevation={1}
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
+          bgcolor: 'background.paper',
+          color: 'text.primary',
         }}
+        component="header"
+        role="banner"
       >
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileOpen}
+            aria-controls="navigation-drawer"
             edge="start"
             onClick={handleDrawerToggle}
             sx={{ mr: 2, display: { sm: 'none' } }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {currentUser?.businessName || 'News Impact Platform'}
-          </Typography>
+          
+          <Box sx={{ flexGrow: 1 }}>
+            <ResponsiveTypography 
+              variant="h6" 
+              mobileVariant="subtitle1"
+              component="div" 
+              noWrap
+            >
+              {currentUser?.businessName || 'News Impact Platform'}
+            </ResponsiveTypography>
+          </Box>
+          
+          {/* Notification icon visible on all screens */}
+          <Tooltip title="Notifications">
+            <IconButton 
+              color="inherit" 
+              sx={{ mr: 1 }}
+              aria-label="Notifications"
+            >
+              <Badge badgeContent={3} color="primary">
+                <NotificationsIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+          
+          {/* User avatar visible only on medium and larger screens */}
+          <Tooltip title={currentUser?.displayName || 'User'}>
+            <Avatar 
+              alt={currentUser?.displayName || 'User'} 
+              src={currentUser?.photoURL} 
+              sx={{ 
+                display: { xs: 'none', md: 'flex' },
+                width: 36, 
+                height: 36,
+                cursor: 'pointer'
+              }}
+              onClick={() => handleNavigation('/profile')}
+              role="button"
+              tabIndex={0}
+              aria-label="Go to profile"
+            >
+              {(currentUser?.displayName || 'U')[0]}
+            </Avatar>
+          </Tooltip>
         </Toolbar>
       </AppBar>
+      
       <Box
         component="nav"
         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-        aria-label="mailbox folders"
+        aria-label="navigation menu"
       >
         {/* Mobile drawer */}
         <Drawer
+          id="navigation-drawer"
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
@@ -187,6 +309,7 @@ export default function MainLayout() {
         >
           {drawer}
         </Drawer>
+        
         {/* Desktop drawer */}
         <Drawer
           variant="permanent"
@@ -199,16 +322,44 @@ export default function MainLayout() {
           {drawer}
         </Drawer>
       </Box>
+      
       <Box
         component="main"
+        id="main-content"
+        tabIndex={-1}
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: contentPadding,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           marginTop: '64px',
+          minHeight: 'calc(100vh - 64px)',
+          bgcolor: 'background.default',
+          outline: 'none',
         }}
+        role="main"
+        aria-label="Main content"
       >
         <Outlet />
+      </Box>
+      
+      <Box
+        component="footer"
+        sx={{
+          mt: 'auto',
+          py: 2,
+          px: contentPadding,
+          bgcolor: 'background.paper',
+          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          ml: { sm: `${drawerWidth}px` },
+          textAlign: 'center',
+          borderTop: '1px solid',
+          borderColor: 'divider',
+        }}
+        role="contentinfo"
+      >
+        <ResponsiveTypography variant="body2" color="text.secondary">
+          © {new Date().getFullYear()} News Impact Platform. All rights reserved.
+        </ResponsiveTypography>
       </Box>
     </Box>
   );

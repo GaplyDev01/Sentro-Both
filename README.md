@@ -24,6 +24,9 @@ Key features include:
 - Material-UI
 - Context API for state management
 
+### Deployment
+- Vercel (Serverless Functions & Static Site Hosting)
+
 ## Setup Instructions
 
 ### Prerequisites
@@ -64,11 +67,16 @@ Key features include:
 ### Frontend Setup
 1. Install frontend dependencies
    ```
-   cd frontend
+   cd src/frontend
    npm install
    ```
 
 2. Start the frontend development server
+   ```
+   npm run dev:client
+   ```
+
+3. Or start both frontend and backend together
    ```
    npm run dev
    ```
@@ -97,6 +105,9 @@ news-impact-platform/
 │       └── App.js           # Main React component
 │
 ├── .env.example             # Example environment variables
+├── .env.production          # Production environment variables
+├── vercel.json              # Vercel deployment configuration
+├── deploy.sh                # Deployment script
 ├── package.json             # Project dependencies
 ├── supabase-schema.sql      # Supabase database schema
 └── README.md                # Project documentation
@@ -130,29 +141,55 @@ news-impact-platform/
 - [x] News controllers and routes
 - [x] Prediction controllers and routes
 - [x] Middleware for authentication, validation, and error handling
-
-### Current Tasks
-- [ ] Set up frontend project structure
-- [ ] Create layout and theme components
-- [ ] Implement authentication pages (login, register)
-- [ ] Create user profile and business setup pages
-- [ ] Develop news feed and article detail pages
-- [ ] Implement prediction visualization components
-
-## Next Steps Before UI Development
-1. Create a Supabase project and run the schema
-2. Obtain API keys for NewsAPI and Repustate
-3. Test API endpoints with Postman or similar tool
-4. Set up frontend project structure and install dependencies
+- [x] Frontend project structure setup
+- [x] Layout and theme components
+- [x] Authentication pages (login, register)
+- [x] User profile and business setup pages
+- [x] News feed and article detail pages
+- [x] Prediction visualization components
+- [x] Vercel deployment configuration
 
 ## Deployment Instructions
-1. Build the frontend
+
+### Deploy to Vercel (Recommended)
+
+#### Quick Method (Script)
+Run the deployment script:
+```
+./deploy.sh
+```
+
+#### Manual Method
+1. Install Vercel CLI
    ```
-   cd frontend
-   npm run build
+   npm install -g vercel
    ```
 
-2. Deploy to a cloud provider of your choice (Vercel, Netlify, Heroku, etc.)
+2. Login to Vercel
+   ```
+   vercel login
+   ```
+
+3. Deploy to Vercel
+   ```
+   vercel
+   ```
+
+4. For production deployment:
+   ```
+   vercel --prod
+   ```
+
+#### Important Environment Variables
+After deploying to Vercel, set up these environment variables in the Vercel dashboard:
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_KEY`
+- `JWT_SECRET`
+- `NEWS_API_KEY`
+- `RAPID_API_KEY`
+
+For detailed deployment instructions, refer to [VERCEL_DEPLOYMENT.md](VERCEL_DEPLOYMENT.md).
 
 ## License
 This project is licensed under the MIT License. 

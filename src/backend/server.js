@@ -28,8 +28,14 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(helmet());
-app.use(morgan('dev'));
+app.use(helmet({
+  contentSecurityPolicy: process.env.NODE_ENV === 'production' ? undefined : false,
+}));
+
+// Only use morgan in development
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('dev'));
+}
 
 // Base API route
 app.use('/api', (req, res, next) => {
@@ -43,12 +49,26 @@ app.use('/api/users', authenticateJwt, userRoutes);
 app.use('/api/news', authenticateJwt, newsRoutes);
 app.use('/api/predictions', authenticateJwt, predictionRoutes);
 
-// Default route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to the News Impact Platform API',
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Set static folder
+  const staticPath = path.join(__dirname, '../../frontend/src/frontend/build');
+  app.use(express.static(staticPath));
+  
+  // Any routes not matched by API will be redirected to index.html
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.resolve(staticPath, 'index.html'));
+    }
   });
-});
+} else {
+  // Default route for development
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Welcome to the News Impact Platform API',
+    });
+  });
+}
 
 // Error handling middleware
 app.use(errorHandler);
@@ -76,14 +96,25 @@ const startServer = async () => {
   }
 };
 
-// Start the server
-startServer();
+// Only start the server if not in a serverless environment
+// Vercel will import the app but not call listen()
+if (process.env.NODE_ENV !== 'production') {
+  startServer();
+} else {
+  // Test connection to Supabase when module is loaded in production
+  testConnection().catch(err => {
+    console.error('Failed to connect to Supabase:', err);
+  });
+}
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);
-  process.exit(1);
+  // Don't exit in production, as it will take down the serverless function
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
 });
 
-// Export app for testing
+// Export app for testing and serverless use
 module.exports = app; 

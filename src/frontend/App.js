@@ -1,7 +1,8 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import theme from './styles/theme';
 
 // Layout
 import MainLayout from './components/layout/MainLayout';
@@ -55,76 +56,6 @@ const AdminRoute = ({ children }) => {
   
   return children;
 };
-
-// Theme configuration
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-    error: {
-      main: '#f44336',
-    },
-    warning: {
-      main: '#ff9800',
-    },
-    info: {
-      main: '#2196f3',
-    },
-    success: {
-      main: '#4caf50',
-    },
-    background: {
-      default: '#fafafa',
-      paper: '#fff',
-    },
-    text: {
-      primary: '#212121',
-    },
-  },
-  typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
-    h1: {
-      fontSize: '2.5rem',
-    },
-    h2: {
-      fontSize: '2rem',
-    },
-    h3: {
-      fontSize: '1.75rem',
-    },
-    h4: {
-      fontSize: '1.5rem',
-    },
-    h5: {
-      fontSize: '1.25rem',
-    },
-    h6: {
-      fontSize: '1rem',
-    },
-    body1: {
-      fontSize: '1rem',
-    },
-    body2: {
-      fontSize: '0.875rem',
-    },
-    caption: {
-      fontSize: '0.75rem',
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-        },
-      },
-    },
-  },
-});
 
 function App() {
   return (
