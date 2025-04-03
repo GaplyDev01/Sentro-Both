@@ -52,7 +52,7 @@ app.use('/api/predictions', authenticateJwt, predictionRoutes);
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {
   // Set static folder
-  const staticPath = path.join(__dirname, '../../frontend/src/frontend/build');
+  const staticPath = path.join(__dirname, '../frontend/build');
   app.use(express.static(staticPath));
   
   // Any routes not matched by API will be redirected to index.html
